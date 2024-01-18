@@ -23,3 +23,60 @@ FROM
 	GROUP BY a.title
 	) a
 GROUP BY rt_range
+
+# Use of multiple subqueries to calculate the average amount paid by the top 5 customers from the top 10 cities that fall within the top 10 countries (top countries and cities are ranked by the number of customers; top customers are ranked by the lifetime value)
+
+SELECT AVG(total_amt_paid) as average_amt_paid
+FROM
+	(
+	SELECT
+		cust.customer_id,
+		cust.first_name,
+		cust.last_name,
+		ctry.country,
+		city.city,
+		SUM(paymt.amount) AS total_amt_paid
+	FROM customer cust
+	INNER JOIN  address addr
+	ON cust.address_id = addr.address_id
+	INNER JOIN city city
+	ON addr.city_id = city.city_id
+	INNER JOIN country ctry
+	ON city.country_id = ctry.country_id
+	INNER JOIN payment paymt
+	ON cust.customer_id = paymt.customer_id
+	WHERE city.city_id IN
+		(
+		SELECT 
+			y.city_id
+		FROM customer x
+		INNER JOIN address y
+		ON x.address_id = y.address_id
+		INNER JOIN city z
+		ON y.city_id = z.city_id
+		WHERE z.country_id IN
+			(
+			SELECT 
+				C.country_id
+			FROM customer A
+			INNER JOIN address B
+			ON A.address_id = B.address_id
+			INNER JOIN city C
+			on B.city_id = C.city_id
+			GROUP BY C.country_id
+			ORDER BY COUNT(A.customer_id) DESC 
+			LIMIT 10
+			)
+		GROUP BY Y.city_id
+		ORDER BY count(X.customer_id) DESC
+		LIMIT 10
+		)
+	GROUP BY 
+		cust.customer_id,
+		cust.first_name,
+		cust.last_name,
+		ctry.country,
+		city.city
+	ORDER BY total_amt_paid DESC
+	LIMIT 5
+	) top_cust
