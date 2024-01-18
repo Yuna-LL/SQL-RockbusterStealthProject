@@ -1,5 +1,5 @@
-# Use of a CTE to aggregate the movie rental data to get the number of films per rental count range
-# THis data is used to plot the Distribution of Films Based on Rental Count donut chart in the Tableau Storyboard.
+# Use of a nested subquery to aggregate the movie rental data to get the number of films per rental count range
+# THis data is used to plot the "Distribution of Films Based on Rental Count" donut chart in the Tableau Storyboard.
 
 SELECT
 	rt_range,
