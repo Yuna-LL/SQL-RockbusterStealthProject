@@ -1,0 +1,25 @@
+# Use of a CTE to aggregate the movie rental data to get the number of films per rental count range
+# THis data is used to plot the Distribution of Films Based on Rental Count donut chart in the [Tableau Storyboard](https://public.tableau.com/app/profile/yuna.tomogae/viz/RockbusterStealthMarketAnalysis/Rockbuster?publish=yes)
+
+SELECT
+	rt_range,
+	COUNT(DISTINCT film_title) AS film_ct
+FROM 
+	(
+	SELECT 
+			a.title AS film_title,
+			CASE
+				WHEN COUNT(DISTINCT c.rental_id) = 0 THEN '0'
+				WHEN COUNT(DISTINCT c.rental_id) between 1 and 9 THEN '1-9'
+				WHEN COUNT(DISTINCT c.rental_id) between 10 and 19 THEN '10-19'
+				WHEN COUNT(DISTINCT c.rental_id) between 20 and 29 THEN '20-29'
+				ELSE '>30'
+			END AS rt_range
+	FROM film a
+	LEFT JOIN inventory b
+	ON a.film_id = b.film_id
+	LEFT JOIN rental c
+	ON b.inventory_id = c.inventory_id
+	GROUP BY a.title
+	) a
+GROUP BY rt_range
