@@ -1,0 +1,57 @@
+# Joining multiple tables of data to load to Tableau for creating visualizations
+
+SELECT		
+	a.rental_id,
+	h.film_id,
+	h.title AS film_title,
+	h.release_year,
+	h.rental_duration,
+	h.rental_rate,
+	h.length,
+	h.replacement_cost,
+	h.rating,
+	m.name AS language_name,
+	o.name AS film_category_name,
+	DATE_PART('day',a.return_date-a.rental_date) AS act_rental_duration,	
+	CASE 
+		WHEN b.amount is not null THEN b.amount
+		ELSE h.rental_rate # value imputation for missing payment amount values
+	END AS paid_amt,	
+	DATE(b.payment_date) AS payment_date,	
+	i.first_name || ' ' || i.last_name AS cust_name,	
+	i.customer_id,	
+	k.city AS cust_city,	
+	l.country AS cust_country,	
+	c.store_id,	
+	f.city AS store_city,	
+	g.country AS store_country	
+FROM rental a		
+LEFT JOIN payment b		
+ON a.rental_id = b.rental_id		
+LEFT JOIN inventory c		
+ON a.inventory_id = c.inventory_id		
+LEFT JOIN store d		
+ON c.store_id = d.store_id		
+LEFT JOIN address e		
+ON d.address_id = e.address_id		
+LEFT JOIN city f		
+ON e.city_id = f.city_id		
+LEFT JOIN country g		
+ON f.country_id = g.country_id				
+LEFT JOIN customer i		
+ON a.customer_id = i.customer_id		
+LEFT JOIN address j		
+ON i.address_id = j.address_id		
+LEFT JOIN city k		
+ON j.city_id = k.city_id		
+LEFT JOIN country l		
+ON k.country_id = l.country_id	
+LEFT JOIN film h
+ON c.film_id = h.film_id
+LEFT JOIN language m	
+ON h.language_id = m.language_id	
+LEFT JOIN film_category n
+ON h.film_id = n.film_id	
+LEFT JOIN category o	
+ON n.category_id = o.category_id
+ORDER BY rental_id
