@@ -1,4 +1,5 @@
 # Discriptive analysis of Film table
+
 SELECT
   AVG(rental_rate) AS average_rental_rate,
   MIN(rental_rate) AS min_rental_rate,
