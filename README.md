@@ -4,7 +4,7 @@ Rockbuster, a fictional movie rental company, is adapting to the challenge posed
 
 ## Objective
 
-This analysis aims to extract valuable insights from historical data of the current movie rental service and offer insights into the strategy for the upcoming online video service.
+This analysis aims to extract valuable insights from the historical data of the current movie rental service and utilize this knowledge to inform the strategic approach for the forthcoming online video platform..
 
 ## Data
 
