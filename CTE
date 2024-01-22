@@ -1,1 +1,49 @@
+# Using temporary tables to calculate the average amount paid by the top 5 customers from the top 10 cities within the top 10 countries 
+
+WITH top_countries AS
+	(			
+	SELECT 
+		C.country_id
+	FROM customer A
+	INNER JOIN address B
+	ON A.address_id = B.address_id
+	INNER JOIN city C
+	on B.city_id = C.city_id
+	GROUP BY C.country_id
+	ORDER BY COUNT(A.customer_id) DESC 
+	LIMIT 10
+	),
+top_cities AS
+	(
+	SELECT 
+		city.city_id
+	FROM customer cust
+	INNER JOIN address addr
+	ON cust.address_id = addr.address_id
+	INNER JOIN city city
+	ON city.city_id = addr.city_id
+	INNER JOIN top_countries
+	ON city.country_id = top_countries.country_id
+	GROUP BY city.city_id
+	ORDER BY count(cust.customer_id) DESC
+	LIMIT 10
+	),
+top_cust AS
+	(
+	SELECT
+		cust.customer_id,
+		SUM(paymt.amount) AS total_amt_paid
+	FROM customer cust
+	INNER JOIN  address addr
+	ON cust.address_id = addr.address_id
+	INNER JOIN payment paymt
+	ON cust.customer_id = paymt.customer_id
+	INNER JOIN top_cities
+	ON addr.city_id = top_cities.city_id
+	GROUP BY cust.customer_id
+	ORDER BY total_amt_paid
+	LIMIT 5
+	)
+SELECT ROUND(AVG(total_amt_paid),2) as average_amt_paid
+FROM top_cust
 
